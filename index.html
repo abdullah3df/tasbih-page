@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -31,17 +32,23 @@
   }
   /* زر التسبيح */
   #tasbihBtn {
-    margin-top:40px;
-    background:#27ae60;
-    color:white;
-    border:none;
-    padding:30px 50px;
-    font-size:1.8em;
-    border-radius:50%;
-    cursor:pointer;
-    transition:transform 0.1s, background 0.3s;
+    margin-top: 40px;
+    background: linear-gradient(145deg, #2ecc71, #27ae60);
+    color: white;
+    border: none;
+    padding: 50px 70px;
+    font-size: 2.2em;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+    transition: transform 0.15s, background 0.3s;
   }
-  #tasbihBtn:active { transform:scale(0.95); }
+  #tasbihBtn:hover {
+    background: linear-gradient(145deg, #27ae60, #2ecc71);
+  }
+  #tasbihBtn:active {
+    transform: scale(0.95);
+  }
   #count {
     font-size:1.2em;
     margin-top:15px;
@@ -54,16 +61,27 @@
   }
 </style>
 </head>
-<body><!-- شاشة الافتتاح --><div id="splash">
+<body>
+
+<!-- شاشة الافتتاح -->
+<div id="splash">
   <div>﴿ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ﴾</div>
   <small>سورة الأعلى - آية 1</small>
-</div><!-- المحتوى الرئيسي --><h1>🌿 تسبيح وذكر الله 🌿</h1>
+</div>
+
+<!-- المحتوى الرئيسي -->
+<h1>🌿 تسبيح وذكر الله 🌿</h1>
 <p>اضغط الزر للتسبيح 10 مرات، ثم شارك الأجر مع أصدقائك</p>
 <button id="tasbihBtn">سَبِّح</button>
 <div id="count">المتبقي: 10</div>
-<div id="phrase"></div><script>
-  // رابط صفحتك
+<div id="phrase"></div>
+
+<!-- الصوت -->
+<audio id="clickSound" src="https://www.soundjay.com/button/button-29.mp3" preload="auto"></audio>
+
+<script>
   const pageLink = "https://share.google/y1S9s1xfewux5ikaA";
+  const clickSound = document.getElementById("clickSound");
 
   // إخفاء شاشة الافتتاح بعد 3 ثواني
   setTimeout(() => {
@@ -77,6 +95,7 @@
 
   btn.addEventListener('click', () => {
     if (count > 0) {
+      clickSound.play();
       phraseEl.innerHTML += "سبحان الله، والحمد لله، ولا إله إلا الله، والله أكبر<br>";
       count--;
       countEl.textContent = "المتبقي: " + count;
@@ -98,5 +117,7 @@
       window.open("https://wa.me/?text=" + encodeURIComponent(pageLink), "_blank");
     }
   }
-</script></body>
+</script>
+
+</body>
 </html>
