@@ -6,58 +6,41 @@
 <title>تسبيح — شارك الأجر</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-  body {
-    margin: 0;
-    font-family: 'Cairo', sans-serif;
-    background: linear-gradient(180deg, #0e201e, #112927);
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    flex-direction: column;
-    text-align: center;
+  body{
+    margin:0;min-height:100dvh;display:flex;flex-direction:column;justify-content:center;align-items:center;
+    font-family:'Cairo',system-ui,-apple-system,'Segoe UI',Roboto,Arial;background:linear-gradient(180deg,#0e201e,#112927);color:#fff;text-align:center
   }
-  #phrase {
-    font-size: 1.8rem;
+  /* منطقة الجملة */
+  #phrase{
+    display:block;
+    max-width: 900px;      /* يمنع سطر طويل جداً على الشاشات الكبيرة */
+    width: min(92vw, 900px);
+    padding: 0 16px;       /* مساحة جانبية كي لا تلتصق بالحواف */
+    margin: 0 auto 14px;
     font-weight: 900;
-    min-height: 3em;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    /* حجم خط مرن حسب الجهاز */
+    font-size: clamp(1.25rem, 5.2vw, 2.4rem);
+    line-height: 1.8;
+    letter-spacing: 0;
+    word-break: normal;
+    white-space: normal;   /* اسمح بالتفاف السطور */
+    opacity:0; transform:scale(.9);
+    transition:opacity .35s ease, transform .35s ease;
+    min-height: 5.4em;     /* يحجز مساحة كافية للجملة كاملة */
   }
-  #phrase.show {
-    opacity: 1;
-    transform: scale(1);
-  }
-  .big {
-    margin-top: 20px;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: linear-gradient(145deg, #1cc46f, #10a557);
+  #phrase.show{ opacity:1; transform:scale(1) }
+
+  /* زر التسبيح */
+  .big{
+    margin-top: 10px; width: 220px; height: 220px; border-radius: 50%;
+    background: linear-gradient(145deg,#1cc46f,#10a557);
     box-shadow: 8px 8px 16px #0a3b27, -8px -8px 16px #1fd68033;
-    border: none;
-    color: #fff;
-    font-size: 1.4rem;
-    font-weight: 900;
-    cursor: pointer;
+    border:none;color:#fff;font-size:1.2rem;font-weight:900;cursor:pointer
   }
-  .big:active {
-    transform: scale(0.98);
-  }
-  #shareOnly {
-    display: none;
-    margin-top: 30px;
-    padding: 15px 30px;
-    font-size: 1.3rem;
-    font-weight: bold;
-    background: #1fa855;
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    cursor: pointer;
-  }
+  .big:active{ transform:scale(.98) }
+
+  /* زر واتساب يظهر بعد الانتهاء */
+  #shareOnly{ display:none;margin-top:22px;padding:14px 22px;font-size:1.15rem;font-weight:900;border:none;border-radius:10px;background:#25d366;color:#fff;cursor:pointer }
 </style>
 </head>
 <body>
@@ -69,15 +52,19 @@
 <script>
 (function(){
   const SHARE_URL = "https://share.google/5InRhAobMRQhrEnlS";
+  const DHIKR = "سبحان الله والحمد لله ولا إله إلا الله والله أكبر";
+
   const big = document.getElementById('big');
   const phraseEl = document.getElementById('phrase');
   const shareBtn = document.getElementById('shareOnly');
+
   let left = 10;
 
-  function showPhrase() {
-    phraseEl.textContent = "سبحان الله والحمد لله ولا إله إلا الله والله أكبر";
-    phraseEl.classList.remove('show');
-    void phraseEl.offsetWidth; // إعادة تشغيل الأنيميشن
+  function showPhrase(){
+    // أعرض الجملة كاملة بخط عريض مع مؤثر Zoom+Fade
+    phraseEl.textContent = DHIKR;
+    phraseEl.classList.remove('show'); // إعادة تشغيل الأنيميشن
+    void phraseEl.offsetWidth;
     phraseEl.classList.add('show');
   }
 
@@ -86,11 +73,11 @@
     window.open(url, "_blank");
   }
 
-  big.addEventListener('click', () => {
-    if (left > 0) {
+  big.addEventListener('click', ()=>{
+    if(left>0){
       left--;
       showPhrase();
-      if (left === 0) {
+      if(left===0){
         big.style.display = "none";
         shareBtn.style.display = "inline-block";
       }
@@ -100,6 +87,5 @@
   shareBtn.addEventListener('click', openWhatsApp);
 })();
 </script>
-
 </body>
 </html>
