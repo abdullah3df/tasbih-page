@@ -3,121 +3,217 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>تسبيح - شارك الأجر</title>
+<title>تسبيح — شارك الأجر</title>
+<meta name="description" content="اذكر الله عشر مرات ثم شارك الأجر بإرسال رابط الصفحة.">
+<meta name="theme-color" content="#0e1c1a">
+
+<!-- خطوط -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+
 <style>
-  body {
-    margin:0;
-    font-family:Tahoma, sans-serif;
-    text-align:center;
-    background:linear-gradient(to bottom,#f8f5f0,#e8e3da);
-    color:#333;
+  :root{
+    --bg1:#0c1716; --bg2:#112927; --card:#0f2321; --edge:#1b3f3a;
+    --text:#eaf7f5; --muted:#a6c8c1; --ring:#183a36;
+    --accent:#25c3a7; --accent2:#89f3df; --share:#1fa855;
   }
-  /* شاشة الافتتاح */
-  #splash {
-    position:fixed; inset:0;
-    background:#0f2f2c;
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    font-size:1.5em;
-    z-index:10;
-    opacity:1;
-    transition:opacity 1s ease;
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100dvh; display:grid; place-items:center;
+    color:var(--text); font-family:"Cairo", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    background:
+      radial-gradient(900px 600px at 100% -10%, #1a5e54 0, #0000 60%),
+      radial-gradient(900px 700px at -10% 120%, #14433f 0, #0000 60%),
+      linear-gradient(180deg,var(--bg1),var(--bg2));
+    overflow-x:hidden;
   }
-  #splash.hide {
-    opacity:0;
-    pointer-events:none;
+
+  /* Splash */
+  .splash{
+    position:fixed; inset:0; display:grid; place-items:center; z-index:10;
+    background:
+      radial-gradient(900px 600px at 100% -10%, #163d37 0, #0000 60%),
+      linear-gradient(180deg,#0b1615,#0e1f1d);
+    animation: fadeIn .5s ease both;
   }
-  /* زر التسبيح */
-  #tasbihBtn {
-    margin-top: 40px;
-    background: linear-gradient(145deg, #2ecc71, #27ae60);
-    color: white;
-    border: none;
-    padding: 50px 70px;
-    font-size: 2.2em;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-    transition: transform 0.15s, background 0.3s;
+  .ayah{
+    text-align:center; padding:22px 26px; border-radius:20px;
+    border:1px solid #214b44; background:linear-gradient(180deg,#0e201e,#0f2321);
+    box-shadow:0 18px 50px #0006; max-width:min(92vw,640px);
   }
-  #tasbihBtn:hover {
-    background: linear-gradient(145deg, #27ae60, #2ecc71);
+  .ayah h2{ margin:0 0 8px; font:400 1.8rem "Amiri Quran", serif; letter-spacing:.2px }
+  .ayah .src{color:var(--muted); font-weight:700}
+  .fade-out{ animation: fadeOut .8s ease forwards }
+
+  @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+  @keyframes fadeOut{ to{opacity:0; transform:scale(1.02)} }
+
+  /* بطاقة التطبيق */
+  .wrap{ width:min(96vw,680px); padding:22px; opacity:0; transform:translateY(12px); transition:.6s ease }
+  .wrap.ready{ opacity:1; transform:translateY(0) }
+  .card{
+    background:linear-gradient(180deg,#0e201e,var(--card));
+    border:1px solid var(--edge); border-radius:24px; padding:26px;
+    box-shadow:0 20px 60px #0007;
   }
-  #tasbihBtn:active {
-    transform: scale(0.95);
+  h1{margin:0 0 8px; font-size:1.35rem; color:var(--text); text-align:center; font-weight:900}
+  .sub{margin:0 0 10px; color:var(--muted); text-align:center}
+
+  /* الزر الكبير */
+  .big{
+    margin:14px auto; width:min(76vw,320px); height:min(76vw,320px); max-width:320px; max-height:320px;
+    border-radius:50%; border:none; color:inherit; cursor:pointer; display:grid; place-items:center;
+    background:conic-gradient(var(--accent) 0deg, var(--accent2) var(--deg), var(--ring) var(--deg));
+    transition:background .25s ease, transform .12s ease, filter .2s ease;
+    box-shadow:0 16px 44px #0006, inset 0 0 0 10px #13302c, inset 0 0 0 1px #265d55;
   }
-  #count {
-    font-size:1.2em;
-    margin-top:15px;
-    color:#555;
+  .big:active{ transform:translateY(1px) scale(.992) }
+  .inner{
+    width:86%; height:86%; border-radius:50%; display:grid; place-items:center; text-align:center; padding:14px;
+    background:linear-gradient(180deg,#0d1e1c,#112725); border:1px solid #1f4c45;
   }
-  #phrase {
-    margin-top:20px;
-    font-size:1.2em;
-    min-height:2em;
+  .label{font-size:1.6rem;font-weight:900}
+  .subtle{font-size:1rem;color:var(--muted);margin-top:6px}
+
+  .share{ /* عند الاكتمال */
+    background:conic-gradient(var(--share) 0deg, #55d78e var(--deg), #164c32 var(--deg));
+    filter: drop-shadow(0 10px 25px #0c3a2777);
+  }
+
+  .stats{display:flex;gap:10px;justify-content:center;margin-top:10px}
+  .pill{min-width:140px;text-align:center;padding:10px 12px;border-radius:999px;background:#0f2422;border:1px solid var(--edge);font-weight:800}
+  .phrase{ text-align:center; font-weight:900; line-height:2; margin:10px 0 14px; font-size:1.2rem; min-height:2.4em }
+  .note{font-size:.9rem;color:var(--muted);text-align:center;margin-top:6px}
+
+  /* احترام تفضيل تقليل الحركة */
+  @media (prefers-reduced-motion: reduce){
+    .wrap{transition:none}
+    .splash,.fade-out{animation:none}
   }
 </style>
 </head>
 <body>
 
-<!-- شاشة الافتتاح -->
-<div id="splash">
-  <div>﴿ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ﴾</div>
-  <small>سورة الأعلى - آية 1</small>
+<!-- Splash -->
+<div id="splash" class="splash" aria-hidden="true">
+  <div class="ayah">
+    <h2>﴿ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ﴾</h2>
+    <div class="src">سورة الأعلى • آية ١</div>
+  </div>
 </div>
 
-<!-- المحتوى الرئيسي -->
-<h1>🌿 تسبيح وذكر الله 🌿</h1>
-<p>اضغط الزر للتسبيح 10 مرات، ثم شارك الأجر مع أصدقائك</p>
-<button id="tasbihBtn">اضغط هنا</button>
-<div id="count">المتبقي: 10</div>
-<div id="phrase"></div>
+<!-- App -->
+<div id="app" class="wrap" role="main">
+  <div class="card">
+    <h1>تسبيح وذكر الله</h1>
+    <p class="sub">اضغط الزر للتسبيح 10 مرات، ثم شارك الأجر مع أصدقائك</p>
 
-<!-- الصوت -->
-<audio id="clickSound" src="https://www.soundjay.com/button/button-29.mp3" preload="auto"></audio>
+    <div id="phrase" class="phrase" aria-live="polite">ابدأ بالضغط على الزر.</div>
+
+    <button id="big" class="big" style="--deg:0deg" aria-label="زر التسبيح">
+      <div class="inner">
+        <div id="label" class="label">اضغط هنا</div>
+        <div class="subtle">المتبقي: <span id="left">10</span> / 10</div>
+      </div>
+    </button>
+
+    <div class="stats" aria-hidden="true">
+      <div class="pill">العدّاد: <span id="count">0</span></div>
+      <div class="pill">المشاركات: <span id="shares">0</span></div>
+    </div>
+
+    <p class="note">عند الاكتمال، المشاركة ترسل <b>رابط الصفحة فقط</b>.</p>
+  </div>
+</div>
 
 <script>
-  const pageLink = "https://share.google/y1S9s1xfewux5ikaA";
-  const clickSound = document.getElementById("clickSound");
+(function(){
+  const SHARE_URL = "https://share.google/y1S9s1xfewux5ikaA";
 
-  // إخفاء شاشة الافتتاح بعد 3 ثواني
-  setTimeout(() => {
-    document.getElementById('splash').classList.add('hide');
-  }, 3000);
+  // Splash
+  const splash = document.getElementById('splash');
+  const app = document.getElementById('app');
+  setTimeout(()=>{ splash.classList.add('fade-out'); }, 2000);
+  setTimeout(()=>{ splash.remove(); app.classList.add('ready'); }, 2800);
 
-  let count = 10;
-  const btn = document.getElementById('tasbihBtn');
+  // عناصر
+  const big = document.getElementById('big');
+  const label = document.getElementById('label');
+  const leftEl = document.getElementById('left');
   const countEl = document.getElementById('count');
+  const sharesEl = document.getElementById('shares');
   const phraseEl = document.getElementById('phrase');
 
-  btn.addEventListener('click', () => {
-    if (count > 0) {
-      clickSound.play();
-      phraseEl.innerHTML += "سبحان الله، والحمد لله، ولا إله إلا الله، والله أكبر<br>";
-      count--;
-      countEl.textContent = "المتبقي: " + count;
-      if (count === 0) {
-        btn.textContent = "📤 شارك الأجر";
-        btn.style.background = "#25d366";
-        btn.onclick = sharePage;
-      }
-    }
-  });
+  // حالة
+  let target=10, left=10, count=0, shareMode=false, lastTap=0;
+  let shares= +localStorage.getItem('tasbih_shares_v8') || 0;
+  sharesEl && (sharesEl.textContent = shares);
 
-  function sharePage() {
-    if (navigator.share) {
-      navigator.share({
-        title: "تسبيح - شارك الأجر",
-        url: pageLink
-      }).catch(err => console.log(err));
-    } else {
-      window.open("https://wa.me/?text=" + encodeURIComponent(pageLink), "_blank");
+  // الصوت (WebAudio)
+  let audioCtx=null;
+  function ensureAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
+  function beep(freq=760, dur=90, vol=0.07){
+    try{
+      ensureAudio();
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type='sine'; o.frequency.value=freq; g.gain.value=vol;
+      o.connect(g).connect(audioCtx.destination);
+      const t=audioCtx.currentTime; o.start(t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t+dur/1000); o.stop(t+dur/1000+0.02);
+    }catch(_){}
+  }
+  function chime(){ [523,659,784].forEach((f,i)=>setTimeout(()=>beep(f,120,0.12), i*140)); }
+  window.addEventListener('pointerdown', ()=>{ try{ensureAudio();}catch(_){} }, {once:true});
+
+  function setProgress(){ big.style.setProperty('--deg', ((target-left)/target)*360 + 'deg'); }
+  function updateUI(){
+    leftEl.textContent = left; countEl.textContent = count; setProgress();
+    if(left===0 && !shareMode){
+      shareMode=true; big.classList.add('share'); label.textContent="📤 شارك الأجر";
+      phraseEl.textContent="أحسنت! اضغط للمشاركة."; chime();
+      if(navigator.vibrate) navigator.vibrate(40);
     }
   }
-</script>
 
+  function shareLink(){
+    // يشارك الرابط فقط
+    if(navigator.share){
+      navigator.share({ title:"تسبيح — شارك الأجر", url:SHARE_URL })
+        .then(()=> afterShare()).catch(()=>{});
+    }else{
+      window.open("https://wa.me/?text=" + encodeURIComponent(SHARE_URL), "_blank", "noopener");
+      afterShare();
+    }
+  }
+  function afterShare(){
+    shares++; localStorage.setItem('tasbih_shares_v8', shares);
+    if(sharesEl) sharesEl.textContent = shares;
+    // إعادة الضبط
+    shareMode=false; left=10; count=0;
+    big.classList.remove('share'); label.textContent="اضغط هنا";
+    phraseEl.textContent="ابدأ بالضغط على الزر."; setProgress(); updateUI();
+  }
+
+  function tap(){
+    // منع النقرات السريعة جدًا
+    const now = Date.now();
+    if(now - lastTap < 100) return;
+    lastTap = now;
+
+    if(shareMode){ shareLink(); return; }
+    if(left>0){
+      count++; left--;
+      phraseEl.textContent = ["سُبحانَ الله","والحمدُ لله","ولا إلهَ إلا الله","واللهُ أكبر"][(count-1)%4];
+      if(navigator.vibrate) navigator.vibrate(18);
+      beep(700+Math.random()*60,70,0.08);
+      updateUI();
+    }
+  }
+
+  big.addEventListener('click', tap);
+  updateUI();
+})();
+</script>
 </body>
 </html>
