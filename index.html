@@ -6,7 +6,7 @@
 <title>تسبيح - شارك الأجر</title>
 <style>
   body {
-    margin:0; padding:0;
+    margin:0;
     font-family:Tahoma, sans-serif;
     text-align:center;
     background:linear-gradient(to bottom,#f8f5f0,#e8e3da);
@@ -23,6 +23,12 @@
     flex-direction:column;
     font-size:1.5em;
     z-index:10;
+    opacity:1;
+    transition:opacity 1s ease;
+  }
+  #splash.hide {
+    opacity:0;
+    pointer-events:none;
   }
   /* زر التسبيح */
   #tasbihBtn {
@@ -34,7 +40,7 @@
     font-size:1.8em;
     border-radius:50%;
     cursor:pointer;
-    transition:transform 0.1s;
+    transition:transform 0.1s, background 0.3s;
   }
   #tasbihBtn:active { transform:scale(0.95); }
   #count {
@@ -65,9 +71,12 @@
 <div id="phrase"></div>
 
 <script>
-  // إخفاء شاشة الافتتاح بعد 3 ثوانٍ
+  // رابط صفحتك
+  const pageLink = "https://share.google/y1S9s1xfewux5ikaA";
+
+  // إخفاء شاشة الافتتاح بعد 3 ثواني
   setTimeout(() => {
-    document.getElementById('splash').style.display = 'none';
+    document.getElementById('splash').classList.add('hide');
   }, 3000);
 
   let count = 10;
@@ -89,14 +98,13 @@
   });
 
   function sharePage() {
-    const link = "https://share.google/y1S9s1xfewux5ikaA";
     if (navigator.share) {
       navigator.share({
         title: "تسبيح - شارك الأجر",
-        url: link
-      });
+        url: pageLink
+      }).catch(err => console.log(err));
     } else {
-      window.open("https://wa.me/?text=" + encodeURIComponent(link), "_blank");
+      window.open("https://wa.me/?text=" + encodeURIComponent(pageLink), "_blank");
     }
   }
 </script>
