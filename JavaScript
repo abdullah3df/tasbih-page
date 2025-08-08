@@ -1,0 +1,6 @@
+function showDhikr(){
+  dhikrEl.textContent = DHIKR;
+  dhikrEl.classList.remove('show', 'shake');
+  void dhikrEl.offsetWidth; // إعادة التهيئة للمؤثر
+  dhikrEl.classList.add('show', 'shake');
+}
