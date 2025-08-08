@@ -1,116 +1,141 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>تسبيح — شارك الأجر</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0e1c1a" />
+<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet" />
 <style>
   :root{
     --bg1:#0c1716; --bg2:#112927; --card:#0f2321; --edge:#1b3f3a;
-    --text:#eaf7f5; --muted:#a6c8c1; --ring:#183a36; --accent:#25c3a7; --accent2:#89f3df;
-    --share:#1fa855;
+    --text:#eaf7f5; --muted:#a6c8c1; --ring:#183a36;
+    --accent:#25c3a7; --accent2:#89f3df; --share:#1fa855;
   }
   *{box-sizing:border-box}
   body{
     margin:0;min-height:100dvh;display:grid;place-items:center;
-    font-family:'Cairo',system-ui,-apple-system,'Segoe UI',Roboto,Arial;
-    color:var(--text);
+    color:var(--text);font-family:"Cairo",system-ui,-apple-system,"Segoe UI",Roboto,Arial;
     background:
       radial-gradient(900px 600px at 100% -10%, #1a5e54 0, #0000 60%),
       radial-gradient(900px 700px at -10% 120%, #14433f 0, #0000 60%),
       linear-gradient(180deg,var(--bg1),var(--bg2));
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.06;
+    background:
+      radial-gradient(1px 1px at 20% 30%, #fff, #0000 60%),
+      radial-gradient(1px 1px at 70% 60%, #fff, #0000 60%),
+      radial-gradient(1px 1px at 40% 80%, #fff, #0000 60%);
   }
 
-  .wrap{width:min(96vw,680px);padding:22px}
-  .card{
-    background:linear-gradient(180deg,#0e201e,var(--card));
-    border:1px solid var(--edge); border-radius:24px; padding:26px;
-    box-shadow:0 20px 60px #0007;
-  }
-  h1{margin:0 0 8px; font-size:1.35rem; text-align:center; font-weight:900}
-  .sub{margin:0 16px 16px; color:var(--muted); text-align:center}
+  /* ===== Splash ===== */
+  .splash{position:fixed;inset:0;display:grid;place-items:center;z-index:10;
+    background:
+      radial-gradient(900px 600px at 100% -10%, #163d37 0, #0000 60%),
+      linear-gradient(180deg,#0b1615,#0e1f1d);
+    animation:fadeIn .45s ease both}
+  .sbox{width:min(92vw,700px);text-align:center;padding:28px;border-radius:22px;
+    border:1px solid #214b44;background:linear-gradient(180deg,#0e201e,#0f2321);
+    box-shadow:0 18px 50px #0007}
+  .bism{font:900 clamp(1rem,3.8vw,1.4rem) "Cairo",sans-serif;margin:0 0 8px;color:#dff5ef}
+  .ayah{font:400 clamp(1.2rem,5.6vw,2rem) "Amiri Quran",serif}
+  .src{color:var(--muted);margin-top:6px}
+  .fade-out{animation:fadeOut .8s ease forwards}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes fadeOut{to{opacity:0;transform:scale(1.02)}}
 
-  /* الجملة فوق الدائرة */
+  /* ===== App Card ===== */
+  .wrap{width:min(96vw,720px);padding:22px;opacity:0;transform:translateY(12px);transition:.55s ease}
+  .wrap.ready{opacity:1;transform:translateY(0)}
+  .card{background:linear-gradient(180deg,#0e201e,var(--card));border:1px solid var(--edge);
+    border-radius:24px;padding:26px;box-shadow:0 20px 60px #0007}
+  h1{margin:0 0 8px;font-size:clamp(1.1rem,2.8vw,1.4rem);text-align:center;font-weight:900}
+  .sub{margin:0 16px 18px;color:var(--muted);text-align:center;font-size:clamp(.9rem,2.4vw,1rem)}
+
+  /* الجملة فوق الحلقة */
   .dhikr{
-    font-weight:900; text-align:center;
-    width:min(92vw,900px); margin:0 auto 14px; padding:0 14px;
-    line-height:1.8; font-size:clamp(1.2rem,4.8vw,2.2rem);
-    opacity:0; transform:translateY(-6px) scale(.98);
-    transition:opacity .35s ease, transform .35s ease;
-    min-height:5.4em;
+    font-weight:900;text-align:center;width:min(92vw,900px);margin:0 auto 16px;padding:0 16px;
+    line-height:1.8;font-size:clamp(1.05rem,4.6vw,2.2rem);
+    opacity:0;transform:translateY(-8px) scale(.98);
+    transition:opacity .35s ease, transform .35s ease;min-height:5.2em
   }
-  .dhikr.show{opacity:1; transform:translateY(0) scale(1)}
+  .dhikr.show{opacity:1;transform:translateY(0) scale(1)}
   .hidden{display:none}
 
-  /* حلقة التقدم (عرض فقط) */
+  /* حلقة التقدم */
   .ring{
-    margin:12px auto 0;
-    width:min(76vw,320px); height:min(76vw,320px); max-width:320px; max-height:320px;
+    margin:8px auto 0;width:min(74vw,320px);height:min(74vw,320px);max-width:320px;max-height:320px;
     border-radius:50%;
-    background:conic-gradient(var(--accent) 0deg, var(--accent2) var(--deg), var(--ring) var(--deg));
-    box-shadow:0 16px 44px #0006, inset 0 0 0 10px #13302c, inset 0 0 0 1px #265d55;
-    position:relative; display:grid; place-items:center;
+    background:conic-gradient(var(--accent) 0deg,var(--accent2) var(--deg),var(--ring) var(--deg));
+    box-shadow:0 16px 44px #0006,inset 0 0 0 10px #13302c,inset 0 0 0 1px #265d55;
+    position:relative;display:grid;place-items:center
   }
-  .ring::after{
-    content:""; position:absolute; inset:8%;
-    border-radius:50%; background:linear-gradient(180deg,#0d1e1c,#112725); border:1px solid #1f4c45;
-  }
-  .under{ text-align:center; margin-top:10px; color:var(--muted); font-weight:900; }
+  .ring::after{content:"";position:absolute;inset:8%;border-radius:50%;
+    background:linear-gradient(180deg,#0d1e1c,#112725);border:1px solid #1f4c45}
+  .under{text-align:center;margin-top:12px;color:var(--muted);font-weight:900;font-size:clamp(.95rem,2.4vw,1rem)}
 
-  /* الزر المستطيل الأنيق أسفل الدائرة */
+  /* زر مستطيل أنيق */
   .ctaBtn{
-    display:block; margin:18px auto 0; padding:14px 28px;
-    border:none; border-radius:14px;
-    font-weight:900; font-size:1.15rem; letter-spacing:.3px; color:#fff; cursor:pointer;
+    display:block;margin:20px auto 0;padding:14px 28px;border:none;border-radius:14px;
+    font-weight:900;font-size:clamp(1rem,2.8vw,1.15rem);letter-spacing:.3px;color:#fff;cursor:pointer;
     background:linear-gradient(135deg,#1cc46f,#10a557);
-    box-shadow:0 10px 22px rgba(12,58,39,.35), inset 0 1px 0 rgba(255,255,255,.08);
-    transition:transform .12s ease, box-shadow .2s ease, filter .2s;
+    box-shadow:0 10px 22px rgba(12,58,39,.35),inset 0 1px 0 rgba(255,255,255,.08);
+    transition:transform .12s ease, box-shadow .2s ease, filter .2s
   }
-  .ctaBtn:hover{ filter:brightness(1.04) }
-  .ctaBtn:active{ transform:translateY(1px) scale(.995); box-shadow:0 8px 18px rgba(12,58,39,.35) }
+  .ctaBtn:hover{filter:brightness(1.04)}
+  .ctaBtn:active{transform:translateY(1px) scale(.995);box-shadow:0 8px 18px rgba(12,58,39,.35)}
 
-  .stats{display:flex;gap:10px;justify-content:center;margin-top:14px}
-  .pill{min-width:140px;text-align:center;padding:10px 12px;border-radius:999px;background:#0f2422;border:1px solid var(--edge);font-weight:800}
+  .stats{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .pill{min-width:160px;text-align:center;padding:10px 12px;border-radius:999px;background:#0f2422;border:1px solid var(--edge);font-weight:800;font-size:clamp(.9rem,2.4vw,1rem)}
 
-  /* صفحة النهاية */
+  /* ===== End Page ===== */
   .end{display:none}
   .end.visible{display:block}
-  .only-card{
-    background:linear-gradient(180deg,#0e201e,var(--card));
-    border:1px solid var(--edge); border-radius:24px; padding:28px;
-    box-shadow:0 20px 60px #0007; text-align:center;
-  }
-  .visits{font-size:1.05rem;color:var(--muted);margin:6px 0 16px}
+  .only-card{background:linear-gradient(180deg,#0e201e,var(--card));border:1px solid var(--edge);
+    border-radius:24px;padding:28px;box-shadow:0 20px 60px #0007;text-align:center}
+  .visits{font-size:clamp(.95rem,2.4vw,1.05rem);color:var(--muted);margin:6px 0 16px}
   .bigShare{
-    margin:10px auto; width:min(80vw,340px); height:min(80vw,340px); max-width:340px; max-height:340px;
-    border-radius:50%; border:none; color:#fff; cursor:pointer; display:grid; place-items:center;
-    font-size:1.35rem; font-weight:900;
+    margin:10px auto;width:min(80vw,340px);height:min(80vw,340px);max-width:340px;max-height:340px;border-radius:50%;border:none;
+    color:#fff;cursor:pointer;display:grid;place-items:center;font-size:clamp(1.05rem,3.4vw,1.35rem);font-weight:900;
     background:linear-gradient(145deg,#1cc46f,#10a557);
-    box-shadow:12px 12px 22px #0a3b27cc,-12px -12px 22px #1fd68033,
-               inset 10px 10px 18px rgba(0,0,0,.35),inset -10px -10px 18px rgba(255,255,255,.07);
-    filter:drop-shadow(0 10px 25px #0c3a2777);
+    box-shadow:12px 12px 22px #0a3b27cc,-12px -12px 22px #1fd68033,inset 10px 10px 18px rgba(0,0,0,.35),inset -10px -10px 18px rgba(255,255,255,.07);
+    filter:drop-shadow(0 10px 25px #0c3a2777)
+  }
+
+  @media (max-width:420px){
+    .dhikr{margin-bottom:12px;min-height:4.6em}
+    .ctaBtn{margin-top:18px}
+    .ring{width:78vw;height:78vw}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .wrap{transition:none}.splash,.fade-out{animation:none}
   }
 </style>
 </head>
 <body>
 
-<!-- الصفحة الرئيسية -->
+<!-- Splash -->
+<div id="splash" class="splash" aria-hidden="true">
+  <div class="sbox">
+    <div class="bism">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيم</div>
+    <div class="ayah">﴿ سَبِّّحِ اسْمَ رَبِّكَ الأَعْلَى ﴾</div>
+    <div class="src">سورة الأعلى • آية ١</div>
+  </div>
+</div>
+
+<!-- App -->
 <div id="app" class="wrap">
   <div class="card">
     <h1>تسبيح وذكر الله</h1>
     <p class="sub">اضغط الزر للتسبيح 10 مرات، ثم شارك الأجر مع أصدقائك</p>
 
-    <!-- الجملة فوق الدائرة -->
-    <div id="dhikrText" class="dhikr hidden">
-      سبحان الله والحمد لله ولا إله إلا الله والله أكبر
-    </div>
+    <div id="dhikrText" class="dhikr hidden">سبحان الله والحمد لله ولا إله إلا الله والله أكبر</div>
 
-    <!-- حلقة التقدم -->
     <div id="ring" class="ring" style="--deg:0deg" aria-hidden="true"></div>
     <div class="under">المتبقي: <b id="left">10</b> / 10</div>
 
-    <!-- الزر المستطيل -->
     <button id="ctaBtn" class="ctaBtn">اضغط هنا</button>
 
     <div class="stats">
@@ -120,10 +145,10 @@
   </div>
 </div>
 
-<!-- صفحة النهاية -->
+<!-- End Page -->
 <div id="end" class="wrap end">
   <div class="only-card">
-    <h2>جزاك الله خيرًا</h2>
+    <h2 style="margin:0 0 8px;font-weight:900">جزاك الله خيرًا</h2>
     <div class="visits">زائروا الصفحة: <b id="visitors">—</b></div>
     <button id="shareOnly" class="bigShare" aria-label="مشاركة على واتساب">📤 شارك الأجر على واتساب</button>
   </div>
@@ -131,27 +156,32 @@
 
 <script>
 (function(){
-  const SHARE_URL = "https://share.google/iked71yadlOiJQZtM";
+  const SHARE_URL = "https://share.google/CxJR0KYYtNoNKd8Xs";
   const DHIKR = "سبحان الله والحمد لله ولا إله إلا الله والله أكبر";
 
-  // عناصر
+  // Splash
+  const splash = document.getElementById('splash');
+  const app = document.getElementById('app');
+  setTimeout(()=>{ splash.classList.add('fade-out'); }, 2000);
+  setTimeout(()=>{ splash.remove(); app.classList.add('ready'); }, 2800);
+
+  // Elements
   const ring = document.getElementById('ring');
   const leftEl = document.getElementById('left');
   const countEl = document.getElementById('count');
   const sharesEl = document.getElementById('shares');
   const cta = document.getElementById('ctaBtn');
   const dhikrEl = document.getElementById('dhikrText');
-  const app = document.getElementById('app');
   const endWrap = document.getElementById('end');
   const visitorsEl = document.getElementById('visitors');
   const shareOnlyBtn = document.getElementById('shareOnly');
 
-  // حالة
+  // State
   let target=10, left=10, count=0, firstShown=false;
-  let shares= +localStorage.getItem('tasbih_shares_final3') || 0;
+  let shares= +localStorage.getItem('tasbih_shares_vX') || 0;
   sharesEl.textContent = shares;
 
-  // صوت بسيط عند الضغط (اختياري)
+  // Audio (WebAudio)
   let audioCtx=null;
   function ensureAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
   function beep(freq=760, dur=90, vol=0.07){
@@ -166,9 +196,7 @@
   }
   window.addEventListener('pointerdown', ()=>{ try{ensureAudio();}catch(_){} }, {once:true});
 
-  function setProgress(){
-    ring.style.setProperty('--deg', ((target-left)/target)*360 + 'deg');
-  }
+  function setProgress(){ ring.style.setProperty('--deg', ((target-left)/target)*360 + 'deg'); }
   function showDhikrAnimated(){
     dhikrEl.textContent = DHIKR;
     dhikrEl.classList.remove('hidden');
@@ -177,6 +205,7 @@
   function updateUI(){
     leftEl.textContent = left; countEl.textContent = count; setProgress();
     if(left===0){
+      // End page
       app.style.display="none";
       endWrap.classList.add('visible');
       fetchVisitors();
@@ -195,7 +224,7 @@
   function shareWhatsApp(){
     const url = "https://wa.me/?text=" + encodeURIComponent(SHARE_URL);
     window.open(url, "_blank", "noopener");
-    shares++; localStorage.setItem('tasbih_shares_final3', shares);
+    shares++; localStorage.setItem('tasbih_shares_vX', shares);
     sharesEl.textContent = shares;
   }
 
