@@ -1,217 +1,105 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>تسبيح — شارك الأجر</title>
-<meta name="description" content="اذكر الله عشر مرات ثم شارك الأجر بإرسال رابط الصفحة.">
-<meta name="theme-color" content="#0e1c1a">
-
-<!-- خطوط جميلة: Cairo للنصوص و Amiri Quran للآية -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg1:#0c1716; --bg2:#112927; --card:#0f2321; --edge:#1b3f3a;
-    --text:#eaf7f5; --muted:#a6c8c1; --ring:#183a36;
-    --accent:#25c3a7; --accent2:#89f3df; --share:#1fa855;
+  body {
+    margin: 0;
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(180deg, #0e201e, #112927);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction: column;
+    text-align: center;
   }
-  *{box-sizing:border-box}
-  body{
-    margin:0; min-height:100dvh; display:grid; place-items:center;
-    color:var(--text); font-family:"Cairo", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-    background:
-      radial-gradient(900px 600px at 100% -10%, #1a5e54 0, #0000 60%),
-      radial-gradient(900px 700px at -10% 120%, #14433f 0, #0000 60%),
-      linear-gradient(180deg,var(--bg1),var(--bg2));
-    overflow-x:hidden;
+  #phrase {
+    font-size: 1.8rem;
+    font-weight: 900;
+    min-height: 3em;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.4s ease, transform 0.4s ease;
   }
-
-  /* شاشة الافتتاح */
-  .splash{
-    position:fixed; inset:0; display:grid; place-items:center; z-index:10;
-    background:
-      radial-gradient(900px 600px at 100% -10%, #163d37 0, #0000 60%),
-      linear-gradient(180deg,#0b1615,#0e1f1d);
-    animation: fadeIn .5s ease both;
+  #phrase.show {
+    opacity: 1;
+    transform: scale(1);
   }
-  .ayah{
-    text-align:center; padding:22px 26px; border-radius:20px;
-    border:1px solid #214b44; background:linear-gradient(180deg,#0e201e,#0f2321);
-    box-shadow:0 18px 50px #0006; max-width:min(92vw,640px);
+  .big {
+    margin-top: 20px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #1cc46f, #10a557);
+    box-shadow: 8px 8px 16px #0a3b27, -8px -8px 16px #1fd68033;
+    border: none;
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 900;
+    cursor: pointer;
   }
-  .ayah h2{ margin:0 0 8px; font:400 1.8rem "Amiri Quran", serif }
-  .ayah .src{color:var(--muted); font-weight:700}
-  .fade-out{ animation: fadeOut .8s ease forwards }
-  @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
-  @keyframes fadeOut{ to{opacity:0; transform:scale(1.02)} }
-
-  /* حاويات */
-  .wrap{ width:min(96vw,680px); padding:22px; opacity:0; transform:translateY(12px); transition:.6s ease }
-  .wrap.ready{ opacity:1; transform:translateY(0) }
-  .card{
-    background:linear-gradient(180deg,#0e201e,var(--card));
-    border:1px solid var(--edge); border-radius:24px; padding:26px;
-    box-shadow:0 20px 60px #0007;
+  .big:active {
+    transform: scale(0.98);
   }
-  h1{margin:0 0 8px; font-size:1.35rem; text-align:center; font-weight:900}
-  .sub{margin:0 0 10px; color:var(--muted); text-align:center}
-  .phrase{ text-align:center; font-weight:900; line-height:2; margin:10px 0 14px; font-size:1.2rem; min-height:2.4em }
-
-  /* الزر الكبير (التسبيح) */
-  .big{
-    margin:14px auto; width:min(76vw,320px); height:min(76vw,320px); max-width:320px; max-height:320px;
-    border-radius:50%; border:none; color:inherit; cursor:pointer; display:grid; place-items:center;
-    background:conic-gradient(var(--accent) 0deg, var(--accent2) var(--deg), var(--ring) var(--deg));
-    transition:background .25s ease, transform .12s ease, filter .2s ease;
-    box-shadow:0 16px 44px #0006, inset 0 0 0 10px #13302c, inset 0 0 0 1px #265d55;
-  }
-  .big:active{ transform:translateY(1px) scale(.992) }
-  .inner{
-    width:86%; height:86%; border-radius:50%; display:grid; place-items:center; text-align:center; padding:14px;
-    background:linear-gradient(180deg,#0d1e1c,#112725); border:1px solid #1f4c45;
-  }
-  .label{font-size:1.6rem;font-weight:900}
-  .subtle{font-size:1rem;color:var(--muted);margin-top:6px}
-
-  /* صفحة النهاية */
-  .end{ display:none }
-  .end.visible{ display:block }
-  .end .only-card{
-    background:linear-gradient(180deg,#0e201e,var(--card));
-    border:1px solid var(--edge); border-radius:24px; padding:28px;
-    box-shadow:0 20px 60px #0007; text-align:center;
-  }
-  .end h2{ margin:0 0 8px; font-weight:900 }
-  .visits{ font-size:1.1rem; color:var(--muted); margin:6px 0 16px }
-
-  /* زر المشاركة المستحيل 3D */
-  .bigShare{
-    margin:10px auto; width:min(80vw,340px); height:min(80vw,340px); max-width:340px; max-height:340px;
-    border-radius:50%; border:none; color:#fff; cursor:pointer; display:grid; place-items:center;
-    font-size:1.35rem; font-weight:900;
-    background:linear-gradient(145deg,#1cc46f,#10a557);
-    box-shadow:
-      12px 12px 22px #0a3b27cc,
-      -12px -12px 22px #1fd68033,
-      inset 10px 10px 18px rgba(0,0,0,.35),
-      inset -10px -10px 18px rgba(255,255,255,.07);
-    filter: drop-shadow(0 10px 25px #0c3a2777);
-  }
-
-  .stats{display:flex;gap:10px;justify-content:center;margin-top:10px}
-  .pill{min-width:140px;text-align:center;padding:10px 12px;border-radius:999px;background:#0f2422;border:1px solid var(--edge);font-weight:800}
-
-  @media (prefers-reduced-motion: reduce){
-    .wrap{transition:none}
-    .splash,.fade-out{animation:none}
+  #shareOnly {
+    display: none;
+    margin-top: 30px;
+    padding: 15px 30px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    background: #1fa855;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
   }
 </style>
 </head>
 <body>
 
-<!-- Splash -->
-<div id="splash" class="splash" aria-hidden="true">
-  <div class="ayah">
-    <h2>﴿ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ﴾</h2>
-    <div class="src">سورة الأعلى • آية ١</div>
-  </div>
-</div>
-
-<!-- صفحة التطبيق -->
-<div id="app" class="wrap">
-  <div class="card" id="mainCard">
-    <h1>تسبيح وذكر الله</h1>
-    <p class="sub">اضغط الزر للتسبيح 10 مرات، ثم شارك الأجر مع أصدقائك</p>
-
-    <div id="phrase" class="phrase">ابدأ بالضغط على الزر.</div>
-
-    <button id="big" class="big" style="--deg:0deg" aria-label="زر التسبيح">
-      <div class="inner">
-        <div id="label" class="label">اضغط هنا</div>
-        <div class="subtle">المتبقي: <span id="left">10</span> / 10</div>
-      </div>
-    </button>
-
-    <div class="stats">
-      <div class="pill">العدّاد: <span id="count">0</span></div>
-      <div class="pill">المشاركات: <span id="shares">0</span></div>
-    </div>
-  </div>
-</div>
-
-<!-- صفحة النهاية (فقط زر مشاركة + عدد الزوار) -->
-<div id="end" class="wrap end">
-  <div class="only-card">
-    <h2>جزاك الله خيرًا</h2>
-    <div class="visits">زائروا الصفحة: <b id="visitors">—</b></div>
-    <button id="shareOnly" class="bigShare" aria-label="مشاركة على واتساب">📤 شارك الأجر على واتساب</button>
-  </div>
-</div>
+<div id="phrase">اضغط الزر لبدء التسبيح</div>
+<button id="big" class="big">اضغط هنا</button>
+<button id="shareOnly">📤 شارك الأجر على واتساب</button>
 
 <script>
 (function(){
-  /* رابط المشاركة النهائي */
-  const SHARE_URL = "https://share.google/y1S9s1xfewux5ikaA";
-
-  const splash = document.getElementById('splash');
-  const app = document.getElementById('app');
-  setTimeout(()=>{ splash.classList.add('fade-out'); }, 2000);
-  setTimeout(()=>{ splash.remove(); app.classList.add('ready'); }, 2800);
-
+  const SHARE_URL = "https://share.google/5InRhAobMRQhrEnlS";
   const big = document.getElementById('big');
-  const leftEl = document.getElementById('left');
-  const countEl = document.getElementById('count');
-  const sharesEl = document.getElementById('shares');
   const phraseEl = document.getElementById('phrase');
-  const endWrap = document.getElementById('end');
-  const visitorsEl = document.getElementById('visitors');
-  const shareOnlyBtn = document.getElementById('shareOnly');
+  const shareBtn = document.getElementById('shareOnly');
+  let left = 10;
 
-  let target=10, left=10, count=0, shareMode=false;
-  let shares= +localStorage.getItem('tasbih_shares_final') || 0;
-  sharesEl.textContent = shares;
-
-  function updateUI(){
-    leftEl.textContent = left; countEl.textContent = count;
-    if(left===0 && !shareMode){
-      shareMode=true;
-      showEndPage();
-    }
+  function showPhrase() {
+    phraseEl.textContent = "سبحان الله والحمد لله ولا إله إلا الله والله أكبر";
+    phraseEl.classList.remove('show');
+    void phraseEl.offsetWidth; // إعادة تشغيل الأنيميشن
+    phraseEl.classList.add('show');
   }
 
   function openWhatsApp(){
     const url = "https://wa.me/?text=" + encodeURIComponent(SHARE_URL);
-    window.open(url, "_blank", "noopener");
-    shares++; localStorage.setItem('tasbih_shares_final', shares);
-    sharesEl.textContent = shares;
+    window.open(url, "_blank");
   }
 
-  async function showEndPage(){
-    app.style.display = "none";
-    endWrap.classList.add('ready','visible');
-    try{
-      const res = await fetch(`https://api.countapi.xyz/hit/tasbih/${encodeURIComponent(location.hostname)}`);
-      const data = await res.json();
-      if(typeof data.value === 'number'){ visitorsEl.textContent = data.value.toLocaleString('ar-EG'); }
-    }catch(e){ visitorsEl.textContent = '—'; }
-  }
-
-  function tap(){
-    if(shareMode) return;
-    if(left>0){
-      count++; left--;
-      phraseEl.textContent = ["سُبحانَ الله","والحمدُ لله","ولا إلهَ إلا الله","واللهُ أكبر"][(count-1)%4];
-      updateUI();
+  big.addEventListener('click', () => {
+    if (left > 0) {
+      left--;
+      showPhrase();
+      if (left === 0) {
+        big.style.display = "none";
+        shareBtn.style.display = "inline-block";
+      }
     }
-  }
+  });
 
-  big.addEventListener('click', tap);
-  shareOnlyBtn.addEventListener('click', openWhatsApp);
-  updateUI();
+  shareBtn.addEventListener('click', openWhatsApp);
 })();
 </script>
+
 </body>
 </html>
