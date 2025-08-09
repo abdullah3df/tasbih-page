@@ -12,13 +12,12 @@
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{
     margin:0;min-height:100dvh;display:grid;place-items:center;
-    font-family: system-ui, -apple-system, "Segoe UI", Arial;
-    color:var(--text);
-    background: linear-gradient(180deg,var(--bg),var(--bg2));
-    overflow-x:hidden;
+    font-family:system-ui,-apple-system,"Segoe UI",Arial;color:var(--text);
+    background:linear-gradient(180deg,var(--bg),var(--bg2));
   }
   .wrap{width:min(96vw,780px);padding:22px;display:none}
-  .wrap.visible{display:block}
+  /* ← ضمان ظهور صفحة البداية دائمًا */
+  #start{display:block}
   .card{
     background:linear-gradient(180deg,#102422,var(--card));
     border:1px solid var(--edge);border-radius:22px;padding:22px;text-align:center;
@@ -26,16 +25,11 @@
   }
   h1{margin:0 0 10px;font-weight:900;font-size:clamp(1.1rem,2.6vw,1.4rem)}
   .muted{color:var(--muted)}
-
-  /* شاشة البداية */
-  .splash h2{margin:6px 0 12px}
   .btn{
-    display:inline-block; border:none; cursor:pointer;
-    background:linear-gradient(145deg,var(--btn1),var(--btn2)); color:#fff;
-    padding:12px 20px; border-radius:12px; font-weight:900; box-shadow:0 10px 24px #0a3b27aa;
+    display:inline-block;border:none;cursor:pointer;
+    background:linear-gradient(145deg,var(--btn1),var(--btn2));color:#fff;
+    padding:12px 20px;border-radius:12px;font-weight:900;box-shadow:0 10px 24px #0a3b27aa;
   }
-
-  /* زر/حلقة التسبيح */
   .ring{
     width:min(74vw,300px);height:min(74vw,300px);border-radius:50%;
     margin:14px auto;background:conic-gradient(#34e3b0 var(--deg,0deg), #173a35 var(--deg,0deg));
@@ -44,9 +38,6 @@
     user-select:none; cursor:pointer; transition:transform .08s ease;
   }
   .ring:active{transform:scale(.99)}
-  .ring > span{pointer-events:none}
-
-  /* نص الذكر */
   #dhikrText{
     margin:8px auto 12px; line-height:1.8; text-align:center;
     font-size:0; opacity:0; transform:translateY(-6px);
@@ -55,40 +46,30 @@
   #dhikrText.show{font-size:clamp(.9rem,3.2vw,1.2rem); opacity:1; transform:translateY(0)}
   #dhikrText.shake{animation:shake .30s ease}
   @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(3px)}50%{transform:translateX(-3px)}75%{transform:translateX(2px)}}
-
-  /* نهاية */
   .bigShare{
     margin:12px auto 6px;width:min(80vw,280px);height:min(80vw,280px);border-radius:50%;border:none;
     display:grid;place-items:center;background:linear-gradient(145deg,var(--btn1),var(--btn2));color:#fff;font-weight:900;cursor:pointer;
     box-shadow:12px 12px 22px rgba(10,59,39,.75),-12px -12px 22px rgba(31,214,128,.2),inset 8px 8px 16px rgba(0,0,0,.35),inset -8px -8px 16px rgba(255,255,255,.07)
   }
   .visits{color:var(--muted);margin:8px 0}
-
-  /* كونفِتي بسيط بدون مكتبات */
   .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:9999;display:none}
-  .paper{
-    position:absolute;width:8px;height:14px;border-radius:2px;opacity:.9;
-    animation: fall 3.2s linear forwards;
-  }
-  @keyframes fall{
-    0%{transform:translateY(-10vh) rotate(0deg)}
-    100%{transform:translateY(110vh) rotate(720deg)}
-  }
+  .paper{position:absolute;width:8px;height:14px;border-radius:2px;opacity:.9;animation:fall 3.2s linear forwards}
+  @keyframes fall{0%{transform:translateY(-10vh) rotate(0)}100%{transform:translateY(110vh) rotate(720deg)}}
 </style>
 </head>
 <body>
 
-<!-- بداية -->
-<div id="start" class="wrap visible">
-  <div class="card splash">
+<!-- البداية -->
+<section id="start" class="wrap">
+  <div class="card">
     <h2>بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيم</h2>
     <p class="muted">﴿ سَبِّّحِ اسْمَ رَبِّكَ الأَعْلَى ﴾</p>
     <button id="goBtn" class="btn">ابدأ</button>
   </div>
-</div>
+</section>
 
 <!-- التسبيح -->
-<div id="app" class="wrap">
+<section id="app" class="wrap">
   <div class="card">
     <h1>تسبيح وذكر الله</h1>
     <p class="muted">اضغط الحلقة 10 مرات، ثم شارك الأجر مع أحبابك</p>
@@ -99,22 +80,23 @@
 
     <div class="muted">المتبقي: <b id="left">10</b> / 10 — العدّاد: <b id="count">0</b></div>
   </div>
-</div>
+</section>
 
 <!-- النهاية -->
-<div id="end" class="wrap">
+<section id="end" class="wrap">
   <div class="card">
     <h2>جزاك الله خيرًا</h2>
     <p class="visits">زائروا الصفحة: <b id="visitors">—</b></p>
     <button id="shareBtn" class="bigShare">📤 شارك الأجر على واتساب</button>
   </div>
-</div>
+</section>
 
 <!-- طبقة الكونفِتي -->
 <div id="confetti" class="confetti"></div>
 
 <script>
-(function(){
+document.addEventListener('DOMContentLoaded', function(){
+
   const SHARE_URL = "https://share.google/y1S9s1xfewux5ikaA";
   const DHIKR = "سبحان الله والحمد لله ولا إله إلا الله والله أكبر";
 
@@ -124,6 +106,7 @@
   const end   = document.getElementById('end');
 
   // عناصر التسبيح
+  const goBtn = document.getElementById('goBtn');
   const ring = document.getElementById('ring');
   const leftEl = document.getElementById('left');
   const countEl = document.getElementById('count');
@@ -134,23 +117,22 @@
   const shareBtn = document.getElementById('shareBtn');
   const confettiLayer = document.getElementById('confetti');
 
-  // بدء
-  document.getElementById('goBtn').addEventListener('click', ()=>{
-    start.classList.remove('visible'); start.style.display='none';
-    app.classList.add('visible');
+  // انتقال من البداية للتسبيح
+  goBtn.addEventListener('click', () => {
+    start.style.display = 'none';
+    app.style.display = 'block';
   });
 
-  // حالة
+  // حالة العدّ
   let target=10, left=10, count=0;
 
-  // صوت خفيف (اختياري على أول تفاعل)
+  // صوت بسيط
   let audioCtx=null;
   function beep(f=760,d=90,v=0.07){
     try{
       if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
       const o=audioCtx.createOscillator(), g=audioCtx.createGain();
-      o.type='sine'; o.frequency.value=f; g.gain.value=v;
-      o.connect(g).connect(audioCtx.destination);
+      o.type='sine'; o.frequency.value=f; g.gain.value=v; o.connect(g).connect(audioCtx.destination);
       const t=audioCtx.currentTime; o.start(t);
       g.gain.exponentialRampToValueAtTime(0.0001,t+d/1000); o.stop(t+d/1000+0.02);
     }catch(_){}
@@ -175,35 +157,26 @@
     if(left===0) showEnd();
   });
 
-  // واتساب
   shareBtn.addEventListener('click', ()=>{
     window.open("https://wa.me/?text=" + encodeURIComponent(SHARE_URL), "_blank", "noopener");
   });
 
-  // نهاية + عداد الزوار + كونفِتي
   async function showEnd(){
-    app.classList.remove('visible'); app.style.display='none';
-    end.classList.add('visible');
-    runConfetti(120, 2800); // عدد القصاصات + المدة
+    app.style.display='none';
+    end.style.display='block';
+    runConfetti(140, 3000);
 
-    // عدّاد ثابت: tasbih-app / main-page-visitors
     try{
       const r = await fetch('https://api.countapi.xyz/hit/tasbih-app/main-page-visitors',{cache:'no-store'});
       const d = await r.json();
-      if(typeof d.value === 'number'){ visitorsEl.textContent = d.value.toLocaleString('ar-EG'); }
-      else throw 0;
-    }catch(e){
-      visitorsEl.textContent = "—";
-    }
+      visitorsEl.textContent = (typeof d.value==='number') ? d.value.toLocaleString('ar-EG') : "—";
+    }catch{ visitorsEl.textContent = "—"; }
   }
 
-  // كونفِتي بسيط بدون مكتبات
   function runConfetti(amount=120, duration=3000){
-    confettiLayer.innerHTML = "";
-    confettiLayer.style.display = 'block';
+    confettiLayer.innerHTML = ""; confettiLayer.style.display = 'block';
     const colors = ["#fff176","#ffd54f","#ff8a65","#4dd0e1","#aed581","#ba68c8","#f06292","#fff"];
-    const W = window.innerWidth, H = window.innerHeight;
-
+    const W = innerWidth, H = innerHeight;
     for(let i=0;i<amount;i++){
       const p = document.createElement('div');
       p.className = 'paper';
@@ -219,7 +192,7 @@
 
   // تهيئة
   setProgress();
-})();
+});
 </script>
 </body>
 </html>
