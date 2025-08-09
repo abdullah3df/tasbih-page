@@ -1,6 +1,39 @@
-function showDhikr(){
-  dhikrEl.textContent = DHIKR;
-  dhikrEl.classList.remove('show', 'shake');
-  void dhikrEl.offsetWidth; // إعادة التهيئة للمؤثر
-  dhikrEl.classList.add('show', 'shake');
+let count = 0;
+const maxCount = 10;
+
+function incrementCounter() {
+  if (count < maxCount) {
+    count++;
+    document.getElementById('countDisplay').textContent = `${count} / ${maxCount}`;
+    document.getElementById('clickCount').textContent = `العداد: ${count}`;
+
+    let dhikr = "سبحان الله والحمد لله ولا إله إلا الله والله أكبر";
+    let textElement = document.getElementById('dhikrText');
+    textElement.textContent = dhikr;
+    textElement.classList.add('show');
+
+    if (count === maxCount) {
+      showFinalPage();
+    }
+  }
+}
+
+function showFinalPage() {
+  document.getElementById('mainPage').style.display = "none";
+  document.getElementById('finalPage').style.display = "block";
+  updateVisitorCount();
+}
+
+function shareOnWhatsApp() {
+  let text = "سبحان الله والحمد لله ولا إله إلا الله والله أكبر 🌸 شارك الأجر";
+  let url = window.location.href;
+  let whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`;
+  window.open(whatsappUrl, '_blank');
+}
+
+function updateVisitorCount() {
+  let count = localStorage.getItem('visitors') || 0;
+  count++;
+  localStorage.setItem('visitors', count);
+  document.getElementById('visitorsCount').textContent = `عدد الزوار: ${count}`;
 }
