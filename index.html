@@ -19,6 +19,7 @@
       radial-gradient(1200px 700px at 110% -10%, #1a5e54 0, #0000 60%),
       radial-gradient(1100px 800px at -10% 120%, #164a45 0, #0000 60%),
       linear-gradient(180deg,var(--bg1),var(--bg2) 50%, var(--bg3));
+    overflow:hidden;
   }
   .wrap{ width:min(96vw,780px); padding:22px; display:none }
   .wrap.visible{ display:block }
@@ -28,6 +29,8 @@
   }
   h1{margin:0 0 8px;font-weight:900;font-size:clamp(1.1rem,2.6vw,1.4rem)}
   .sub{margin:0 0 16px;color:var(--muted)}
+
+  /* نص الذكر (صغير ومُتجاوب) + اهتزاز خفيف */
   #dhikrText{
     font-weight:900; margin:12px auto 8px; line-height:1.8; white-space:normal;
     font-size:0; opacity:0; transform:translateY(-8px) scale(.98);
@@ -36,6 +39,8 @@
   #dhikrText.show{ opacity:1; transform:translateY(0) scale(1); font-size:clamp(.9rem,3vw,1.3rem) }
   #dhikrText.shake{ animation:shake .35s ease both }
   @keyframes shake{0%,100%{transform:translateX(0)}15%,45%,75%{transform:translateX(3px)}30%,60%,90%{transform:translateX(-3px)}}
+
+  /* الدائرة = زر */
   .ringBtn{
     margin:8px auto 0; width:min(74vw,320px); height:min(74vw,320px); max-width:320px; max-height:320px;
     border-radius:50%; border:none; cursor:pointer; position:relative; display:block; isolation:isolate;
@@ -48,7 +53,8 @@
     background:linear-gradient(180deg,#0d1e1c,#122826); border:1px solid #1e4e47; z-index:1;
     box-shadow: inset 12px 12px 20px rgba(0,0,0,.35), inset -10px -10px 18px rgba(255,255,255,.05);
   }
-  .ring-label{ position:absolute; inset:0; display:grid; place-items:center; z-index:2; font-weight:900 }
+  .ring-label{ position:absolute; inset:0; display:grid; place-items:center; z-index:2; font-weight:900; color:#fff }
+
   .under{ margin-top:10px; color:var(--muted); font-weight:900 }
   .stats{ display:flex; gap:10px; justify-content:center; margin-top:12px; flex-wrap:wrap }
   .pill{ min-width:140px; padding:8px 12px; border-radius:999px; background:#0f2422; border:1px solid var(--edge) }
@@ -64,6 +70,16 @@
                inset 10px 10px 18px rgba(0,0,0,.35), inset -10px -10px 18px rgba(255,255,255,.07);
   }
   .bigShare svg{ width:56px; height:56px; filter:drop-shadow(0 2px 4px rgba(0,0,0,.35)) }
+
+  /* كانفاس المؤثرات */
+  #celebrate{
+    position:fixed; inset:0; pointer-events:none; display:none;
+    z-index:9999; /* فوق كل شيء */
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #dhikrText{ transition:none } #dhikrText.shake{ animation:none }
+  }
 </style>
 </head>
 <body>
@@ -103,9 +119,12 @@
   </div>
 </div>
 
+<!-- كانفاس المؤثرات -->
+<canvas id="celebrate"></canvas>
+
 <script>
 (function(){
-  const SHARE_URL = "https://share.google/CxJR0KYYtNoNKd8Xs";
+  const SHARE_URL = "https://share.google/y1S9s1xfewux5ikaA";
   const DHIKR = "سبحان الله والحمد لله ولا إله إلا الله والله أكبر";
 
   const app = document.getElementById('app');
@@ -117,12 +136,14 @@
   const sharesEl = document.getElementById('shares');
   const visitorsEl = document.getElementById('visitors');
   const shareOnlyBtn = document.getElementById('shareOnly');
+  const canvas = document.getElementById('celebrate');
+  const ctx = canvas.getContext('2d');
 
   let target=10, left=10, count=0;
   let shares= +localStorage.getItem('tasbih_shares') || 0;
   sharesEl.textContent = shares;
 
-  // صوت بسيط
+  /* صوت بسيط */
   let audioCtx=null;
   function ensureAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
   function beep(f=760,d=90,v=0.07){ try{ ensureAudio(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='sine'; o.frequency.value=f; g.gain.value=v; o.connect(g).connect(audioCtx.destination); const t=audioCtx.currentTime; o.start(t); g.gain.exponentialRampToValueAtTime(0.0001,t+d/1000); o.stop(t+d/1000+0.02);}catch(_){} }
@@ -153,11 +174,110 @@
     shares++; localStorage.setItem('tasbih_shares', shares); sharesEl.textContent = shares;
   });
 
+  /* ===== مؤثرات الفرح/الحفل ===== */
+  let particles=[], fireworks=[], rafId=null, startTime=0, duration=5000; // 5 ثوانٍ
+  const colors = ["#fff176","#ffd54f","#ff8a65","#4dd0e1","#aed581","#ba68c8","#f06292","#fff"];
+
+  function resizeCanvas(){
+    canvas.width = innerWidth; canvas.height = innerHeight;
+  }
+  addEventListener('resize', resizeCanvas);
+
+  function spawnConfetti(count=180){
+    for(let i=0;i<count;i++){
+      particles.push({
+        x: Math.random()*canvas.width,
+        y: -20 - Math.random()*canvas.height*0.4,
+        r: 2 + Math.random()*4,
+        c: colors[(Math.random()*colors.length)|0],
+        vx: (-1+Math.random()*2)*2,
+        vy: 2 + Math.random()*3,
+        rot: Math.random()*Math.PI*2,
+        vr: (-1+Math.random()*2)*0.1,
+        life: 100+Math.random()*100
+      });
+    }
+  }
+
+  function spawnFirework(){
+    const cx = canvas.width*(0.2+Math.random()*0.6);
+    const cy = canvas.height*(0.3+Math.random()*0.5);
+    const n = 40 + (Math.random()*20)|0;
+    for(let i=0;i<n;i++){
+      const a = (i/n)*Math.PI*2;
+      const sp = 2 + Math.random()*3;
+      fireworks.push({
+        x: cx, y: cy,
+        vx: Math.cos(a)*sp, vy: Math.sin(a)*sp,
+        r: 2 + Math.random()*2,
+        c: colors[(Math.random()*colors.length)|0],
+        life: 60 + Math.random()*40
+      });
+    }
+  }
+
+  function drawParticles(list, gravity=0.05, drag=0.99){
+    for(let i=list.length-1;i>=0;i--){
+      const p = list[i];
+      p.vy += gravity;
+      p.vx *= drag; p.vy *= drag;
+      p.x += p.vx; p.y += p.vy;
+      p.rot = (p.rot||0) + (p.vr||0);
+      p.life -= 1;
+      // رسم
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot||0);
+      ctx.fillStyle=p.c;
+      ctx.globalAlpha = Math.max(0, Math.min(1, p.life/100));
+      ctx.fillRect(-p.r, -p.r, p.r*2, p.r*2);
+      ctx.restore();
+      if(p.life<=0 || p.y>canvas.height+20) list.splice(i,1);
+    }
+  }
+
+  function loop(ts){
+    if(!startTime) startTime = ts;
+    const elapsed = ts - startTime;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    drawParticles(particles, 0.06, 0.992);
+    drawParticles(fireworks, 0.02, 0.985);
+
+    // نضيف دفعات خلال أول 2.5 ثانية
+    if(elapsed < duration*0.5){
+      if(elapsed % 200 < 16) spawnFirework();
+      if(elapsed % 180 < 16) spawnConfetti(60);
+    }
+
+    if(elapsed < duration || particles.length || fireworks.length){
+      rafId = requestAnimationFrame(loop);
+    }else{
+      // نهاية العرض
+      canvas.style.display = 'none';
+      cancelAnimationFrame(rafId);
+      rafId=null; startTime=0;
+    }
+  }
+
+  function startCelebrate(){
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    resizeCanvas();
+    canvas.style.display = 'block';
+    particles.length=0; fireworks.length=0; startTime=0;
+    spawnConfetti(200);
+    spawnFirework(); spawnFirework();
+    rafId = requestAnimationFrame(loop);
+  }
+
+  /* ===== صفحة النهاية + عداد زوار ===== */
   async function showEnd(){
     app.classList.remove('visible'); app.style.display='none';
     endWrap.classList.add('visible');
 
-    // عدّاد زوار (ثابت + بديل محلي)
+    // ابدأ مؤثرات الفرح
+    startCelebrate();
+
+    // عدّاد زوّار (ثابت + بديل محلي)
     const NS="tasbih-app", KEY="main-page-visitors";
     try{
       const r=await fetch(`https://api.countapi.xyz/hit/${NS}/${KEY}`, {cache:"no-store"});
