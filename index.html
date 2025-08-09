@@ -1,135 +1,276 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>تسبيح — شارك الأجر</title>
+<meta name="theme-color" content="#0e1c1a" />
+<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet" />
 <style>
-body {
-    font-family: 'Tajawal', sans-serif;
-    background-color: #0f2f2f;
-    color: white;
-    text-align: center;
-    margin: 0;
-    padding: 0;
-}
-.bismillah {
-    font-size: 22px;
-    margin-top: 50px;
-    color: #ffdf80;
-}
-.ayah {
-    font-size: 28px;
-    color: #00ffaa;
-    margin-top: 20px;
-}
-.container { margin-top: 40px; }
-h2 { font-size: 24px; }
-p { font-size: 16px; opacity: 0.9; }
-#phrase {
-    font-size: 18px;
-    margin-top: 20px;
-    transition: transform 0.1s ease;
-}
-.circle {
-    width: 200px;
-    height: 200px;
-    background: conic-gradient(#00ffaa 0%, #004d4d 0%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 30px auto;
-    cursor: pointer;
-}
-#circle-text {
-    font-size: 18px;
-    font-weight: bold;
-}
-button {
-    padding: 10px 20px;
-    font-size: 18px;
-    border: none;
-    background: #25D366;
-    color: white;
-    border-radius: 10px;
-    cursor: pointer;
-}
-button:hover { background: #1ebc5c; }
-.shake { transform: scale(1.1); }
+  :root{
+    --bg1:#0b1b19; --bg2:#0f2623; --bg3:#12312c;
+    --card:#0f2321; --edge:#1b3f3a;
+    --text:#ecf7f5; --muted:#a6c8c1;
+    --accent:#2dd4bf; --accent2:#8ef5e5; --ring:#193d38;
+    --cta1:#1cc46f; --cta2:#10a557; --wa:#25d366;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;min-height:100dvh;display:grid;place-items:center;
+    color:var(--text);font-family:"Cairo",system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+    background:
+      radial-gradient(1200px 700px at 110% -10%, #1a5e54 0, #0000 60%),
+      radial-gradient(1100px 800px at -10% 120%, #154b45 0, #0000 60%),
+      linear-gradient(180deg,var(--bg1),var(--bg2) 50%, var(--bg3));
+    overflow-x:hidden;
+  }
+  /* زخرفة خفيفة */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; opacity:.06;
+    background:
+      radial-gradient(1px 1px at 20% 30%, #fff, #0000 60%),
+      radial-gradient(1px 1px at 70% 60%, #fff, #0000 60%),
+      radial-gradient(1px 1px at 40% 80%, #fff, #0000 60%);
+  }
+
+  /* ===== SPLASH ===== */
+  .splash{
+    position:fixed; inset:0; display:grid; place-items:center; z-index:10;
+    background:
+      radial-gradient(900px 600px at 100% -10%, #163d37 0, #0000 60%),
+      linear-gradient(180deg,#0b1615,#0e1f1d);
+    animation: fadeIn .45s ease both;
+  }
+  .sbox{
+    width:min(92vw,720px); text-align:center; padding:28px; border-radius:24px;
+    border:1px solid #214b44;
+    background:linear-gradient(180deg,#0e201e,#0f2321);
+    box-shadow:0 20px 60px #0009;
+    backdrop-filter: blur(4px);
+  }
+  .bism{ font:900 clamp(1rem,3.8vw,1.4rem) "Cairo",sans-serif; margin:0 0 8px; color:#e9fff9 }
+  .ayah{ font:400 clamp(1.2rem,5.6vw,2rem) "Amiri Quran",serif }
+  .src{ color:var(--muted); margin-top:6px }
+  .fade-out{ animation: fadeOut .8s ease forwards }
+  @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+  @keyframes fadeOut{ to{opacity:0; transform:scale(1.02)} }
+
+  /* ===== APP CARD ===== */
+  .wrap{ width:min(96vw,760px); padding:22px; opacity:0; transform:translateY(12px); transition:.55s ease }
+  .wrap.ready{ opacity:1; transform:translateY(0) }
+  .card{
+    background:linear-gradient(180deg,#0e201e,var(--card));
+    border:1px solid var(--edge); border-radius:28px; padding:26px;
+    box-shadow:0 24px 64px #0009;
+  }
+  h1{margin:0 0 8px; font-size:clamp(1.1rem,2.8vw,1.4rem); text-align:center; font-weight:900}
+  .sub{margin:0 16px 18px; color:var(--muted); text-align:center; font-size:clamp(.9rem,2.4vw,1rem)}
+
+  /* الجملة فوق الحلقة (صفر بالبداية + اهتزاز) */
+  #dhikrText{
+    font-weight:900; text-align:center; width:min(92vw,880px); margin:0 auto 16px; padding:0 14px;
+    line-height:1.8; white-space:normal; word-break:normal;
+    font-size:0; opacity:0; transform:translateY(-8px) scale(.98);
+    transition:opacity .3s ease, transform .3s ease, font-size .3s ease;
+    min-height:4.8em;
+  }
+  #dhikrText.show{ opacity:1; transform:translateY(0) scale(1); font-size:clamp(1rem,3.8vw,1.6rem) }
+  #dhikrText.shake{ animation:shake .35s ease }
+  @keyframes shake{
+    15%,45%,75%{ transform:translateX(4px) }
+    30%,60%,90%{ transform:translateX(-4px) }
+    0%,100%{ transform:translateX(0) }
+  }
+
+  /* الحلقة = زر (Neumorphism + progress) */
+  .ringBtn{
+    margin:8px auto 0; width:min(74vw,320px); height:min(74vw,320px); max-width:320px; max-height:320px;
+    border-radius:50%; border:none; cursor:pointer; position:relative; display:block; isolation:isolate;
+    background:conic-gradient(var(--accent) 0deg, var(--accent2) var(--deg), var(--ring) var(--deg));
+    box-shadow:
+      16px 16px 34px rgba(0,0,0,.45),
+      -10px -10px 26px rgba(255,255,255,.04),
+      inset 0 0 0 10px #13302c, inset 0 0 0 1px #265d55;
+    transition:transform .08s ease, filter .2s ease;
+  }
+  .ringBtn:hover{ filter:brightness(1.03) }
+  .ringBtn:active{ transform:scale(.992) }
+  .ringBtn::after{
+    content:""; position:absolute; inset:8%; border-radius:50%;
+    background:linear-gradient(180deg,#0d1e1c,#112725); border:1px solid #1f4c45; z-index:1;
+    box-shadow: inset 10px 10px 18px rgba(0,0,0,.35), inset -10px -10px 18px rgba(255,255,255,.05);
+  }
+  .ring-label{
+    position:absolute; inset:0; display:grid; place-items:center; z-index:2;
+    font-weight:900; font-size:clamp(1rem,3.4vw,1.25rem); color:#fff; pointer-events:none;
+    text-shadow:0 1px 2px #0006;
+  }
+
+  .under{ text-align:center; margin-top:12px; color:var(--muted); font-weight:900; font-size:clamp(.95rem,2.4vw,1rem) }
+
+  .stats{ display:flex; gap:10px; justify-content:center; margin-top:14px; flex-wrap:wrap }
+  .pill{ min-width:160px; text-align:center; padding:10px 12px; border-radius:999px;
+    background:#0f2422; border:1px solid var(--edge); font-weight:800; font-size:clamp(.9rem,2.4vw,1rem) }
+
+  /* ===== END PAGE ===== */
+  .end{ display:none }
+  .end.visible{ display:block }
+  .only-card{
+    background:linear-gradient(180deg,#0e201e,var(--card));
+    border:1px solid var(--edge); border-radius:28px; padding:28px;
+    box-shadow:0 24px 64px #0009; text-align:center;
+  }
+  .visits{ font-size:clamp(.95rem,2.4vw,1.05rem); color:var(--muted); margin:6px 0 16px }
+  .bigShare{
+    margin:10px auto; width:min(80vw,340px); height:min(80vw,340px); max-width:340px; max-height:340px;
+    border-radius:50%; border:none; color:#fff; cursor:pointer; display:grid; place-items:center;
+    font-size:clamp(1.05rem,3.4vw,1.35rem); font-weight:900;
+    background:linear-gradient(145deg,var(--cta1),var(--cta2));
+    box-shadow:12px 12px 22px #0a3b27cc,-12px -12px 22px #1fd68033,
+               inset 10px 10px 18px rgba(0,0,0,.35), inset -10px -10px 18px rgba(255,255,255,.07);
+    filter:drop-shadow(0 10px 25px #0c3a2777)
+  }
+
+  @media (max-width:420px){
+    #dhikrText{ margin-bottom:12px; min-height:4.4em }
+    .ringBtn{ width:78vw; height:78vw }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .wrap{transition:none} .splash,.fade-out{animation:none}
+  }
 </style>
 </head>
 <body>
 
-<!-- صفحة البداية -->
-<div id="start-screen">
-    <h2 class="bismillah">بسم الله الرحمن الرحيم</h2>
-    <h1 class="ayah">سَبِّحِ اسْمَ رَبِّكَ الْأَعْلَى</h1>
+<!-- SPLASH -->
+<div id="splash" class="splash" aria-hidden="true">
+  <div class="sbox">
+    <div class="bism">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيم</div>
+    <div class="ayah">﴿ سَبِّّحِ اسْمَ رَبِّكَ الأَعْلَى ﴾</div>
+    <div class="src">سورة الأعلى • آية ١</div>
+  </div>
 </div>
 
-<!-- صفحة التسبيح -->
-<div id="tasbih-screen" style="display:none;">
-    <div class="container">
-        <h2>تسبيح وذكر الله</h2>
-        <p>اضغط الدائرة للتسبيح 10 مرات، ثم شارك الأجر مع أصدقائك</p>
-        <h3 id="phrase">سبحان الله والحمد لله ولا إله إلا الله والله أكبر</h3>
-        <div id="circle" class="circle">
-            <span id="circle-text">اضغط هنا</span>
-        </div>
-        <p id="counter">المتبقي: 10 / 10</p>
+<!-- APP -->
+<div id="app" class="wrap" style="display:none">
+  <div class="card">
+    <h1>تسبيح وذكر الله</h1>
+    <p class="sub">اضغط الحلقة 10 مرات، ثم شارك الأجر مع أصدقائك</p>
+
+    <!-- الجملة فوق الحلقة -->
+    <div id="dhikrText">سبحان الله والحمد لله ولا إله إلا الله والله أكبر</div>
+
+    <!-- الحلقة = زر -->
+    <button id="ringBtn" class="ringBtn" aria-label="سبّح" style="--deg:0deg">
+      <span class="ring-label">اضغط هنا</span>
+    </button>
+    <div class="under">المتبقي: <b id="left">10</b> / 10</div>
+
+    <!-- إحصاءات -->
+    <div class="stats">
+      <div class="pill">العدّاد: <span id="count">0</span></div>
+      <div class="pill">المشاركات: <span id="shares">0</span></div>
     </div>
+  </div>
 </div>
 
-<!-- صفحة النهاية -->
-<div id="end-screen" style="display:none;">
-    <h2>جزاك الله خيرًا</h2>
-    <p>لقد أكملت التسبيح. شارك الأجر مع أصدقائك</p>
-    <button id="share-btn">📤 مشاركة عبر واتساب</button>
+<!-- END PAGE -->
+<div id="end" class="wrap end">
+  <div class="only-card">
+    <h2 style="margin:0 0 8px;font-weight:900">جزاك الله خيرًا</h2>
+    <div class="visits">زائروا الصفحة: <b id="visitors">—</b></div>
+    <button id="shareOnly" class="bigShare" aria-label="مشاركة على واتساب">📤 شارك الأجر على واتساب</button>
+  </div>
 </div>
 
 <script>
-let count = 10;
-let circle = document.getElementById("circle");
-let counterText = document.getElementById("counter");
-let phrase = document.getElementById("phrase");
-let startScreen = document.getElementById("start-screen");
-let tasbihScreen = document.getElementById("tasbih-screen");
-let endScreen = document.getElementById("end-screen");
-let shareBtn = document.getElementById("share-btn");
+(function(){
+  const SHARE_URL = "https://share.google/CxJR0KYYtNoNKd8Xs";
+  const DHIKR = "سبحان الله والحمد لله ولا إله إلا الله والله أكبر";
 
-// صفحة البداية
-setTimeout(() => {
-    startScreen.style.display = "none";
-    tasbihScreen.style.display = "block";
-}, 3000);
+  /* Splash -> App */
+  const splash = document.getElementById('splash');
+  const app = document.getElementById('app');
+  setTimeout(()=>{ splash.classList.add('fade-out'); }, 2000);
+  setTimeout(()=>{ splash.remove(); app.style.display='block'; app.classList.add('ready'); }, 2800);
 
-// عند الضغط على الدائرة
-circle.addEventListener("click", () => {
-    if (count > 0) {
-        count--;
-        counterText.textContent = `المتبقي: ${count} / 10`;
+  /* Elements */
+  const dhikrEl = document.getElementById('dhikrText');
+  const ringBtn = document.getElementById('ringBtn');
+  const leftEl = document.getElementById('left');
+  const countEl = document.getElementById('count');
+  const sharesEl = document.getElementById('shares');
+  const endWrap = document.getElementById('end');
+  const visitorsEl = document.getElementById('visitors');
+  const shareOnlyBtn = document.getElementById('shareOnly');
 
-        // حركة اهتزاز للنص
-        phrase.classList.add("shake");
-        setTimeout(() => phrase.classList.remove("shake"), 150);
+  /* State */
+  let target=10, left=10, count=0;
+  let shares= +localStorage.getItem('tasbih_shares_modern') || 0;
+  sharesEl.textContent = shares;
 
-        // تحديث الدائرة
-        let progress = ((10 - count) / 10) * 100;
-        circle.style.background = `conic-gradient(#00ffaa ${progress}%, #004d4d ${progress}%)`;
+  /* Audio (WebAudio) */
+  let audioCtx=null;
+  function ensureAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
+  function beep(freq=760, dur=90, vol=0.07){
+    try{
+      ensureAudio();
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type='sine'; o.frequency.value=freq; g.gain.value=vol;
+      o.connect(g).connect(audioCtx.destination);
+      const t=audioCtx.currentTime; o.start(t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t+dur/1000); o.stop(t+dur/1000+0.02);
+    }catch(_){}
+  }
+  window.addEventListener('pointerdown', ()=>{ try{ensureAudio();}catch(_){} }, {once:true});
 
-        if (count === 0) {
-            tasbihScreen.style.display = "none";
-            endScreen.style.display = "block";
-        }
-    }
-});
+  function setProgress(){ ringBtn.style.setProperty('--deg', ((target-left)/target)*360 + 'deg'); }
+  function showDhikr(){
+    dhikrEl.textContent = DHIKR;
+    dhikrEl.classList.remove('show','shake');
+    void dhikrEl.offsetWidth;
+    dhikrEl.classList.add('show','shake');
+  }
+  function updateUI(){
+    leftEl.textContent = left;
+    countEl.textContent = count;
+    setProgress();
+    if(left===0){ showEnd(); }
+  }
 
-// زر المشاركة
-shareBtn.addEventListener("click", () => {
-    let url = "https://share.google/CxJR0KYYtNoNKd8Xs";
-    window.open(`https://wa.me/?text=${encodeURIComponent("تسبيح — شارك الأجر " + url)}`, "_blank");
-});
+  async function showEnd(){
+    document.getElementById('app').style.display="none";
+    endWrap.classList.add('visible');
+    endWrap.style.display="block";
+    try{
+      const key = (location.hostname + location.pathname).replace(/[^a-z0-9]/gi,'-').replace(/-+/g,'-').toLowerCase() || "root";
+      const res = await fetch(`https://api.countapi.xyz/hit/tasbih/${encodeURIComponent(key)}`);
+      const data = await res.json();
+      if(typeof data.value === 'number'){ visitorsEl.textContent = data.value.toLocaleString('ar-EG'); }
+    }catch(e){ visitorsEl.textContent = '—'; }
+  }
+
+  function shareWhatsApp(){
+    window.open("https://wa.me/?text=" + encodeURIComponent(SHARE_URL), "_blank", "noopener");
+    shares++; localStorage.setItem('tasbih_shares_modern', shares);
+    sharesEl.textContent = shares;
+  }
+
+  ringBtn.addEventListener('click', ()=>{
+    if(left<=0) return;
+    count++; left--;
+    if(navigator.vibrate) navigator.vibrate(16);
+    beep(720+Math.random()*60,70,0.08);
+    showDhikr();
+    updateUI();
+  });
+
+  shareOnlyBtn.addEventListener('click', shareWhatsApp);
+
+  /* بدء: الجملة مخفية بالحجم صفر، ستظهر أول ضغطة */
+  // (لا نضيف show هنا)
+  setProgress();
+})();
 </script>
-
 </body>
 </html>
