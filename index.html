@@ -4,30 +4,146 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>تسبيح — شارك الأجر</title>
-<link rel="stylesheet" href="style.css">
+<style>
+  body{
+    margin:0;
+    font-family:"Tajawal",sans-serif;
+    background:#e6f2f0;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    min-height:100vh;color:#053d2e;
+  }
+  .wrap{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
+  .visible{display:flex}
+  .circle{
+    width:200px;height:200px;border-radius:50%;
+    background:linear-gradient(145deg,#1cc46f,#10a557);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:1.4rem;font-weight:bold;
+    box-shadow:0 8px 20px rgba(0,0,0,.2);
+    cursor:pointer;user-select:none;
+    transition:transform 0.1s ease;
+  }
+  .circle:active{transform:scale(0.97)}
+  #dhikrText{
+    font-weight:900;
+    margin:20px auto;
+    line-height:1.6;
+    font-size:0;
+    opacity:0;
+    transform:translateY(-8px) scale(.98);
+    transition:opacity .3s ease,transform .3s ease,font-size .3s ease;
+    min-height:3.6em;
+  }
+  #dhikrText.show{
+    opacity:1;transform:translateY(0) scale(1);
+    font-size:1.2rem;
+  }
+  .only-card{
+    background:rgba(15,35,33,.88);
+    border-radius:28px;
+    padding:28px;
+    color:#eef8f6;
+    box-shadow:0 24px 64px rgba(0,0,0,.55);
+  }
+  .bigShare{
+    margin:14px auto 4px;
+    width:200px;height:200px;
+    border:none;border-radius:50%;
+    display:grid;place-items:center;
+    gap:8px;
+    cursor:pointer;
+    background:linear-gradient(145deg,#1cc46f,#10a557);
+    color:#fff;font-weight:900;font-size:1rem;
+    box-shadow:
+      12px 12px 22px rgba(10,59,39,.75),
+      -12px -12px 22px rgba(31,214,128,.2),
+      inset 10px 10px 18px rgba(0,0,0,.35),
+      inset -10px -10px 18px rgba(255,255,255,.07);
+    transition:transform .12s ease,filter .2s ease;
+  }
+  .bigShare:hover{filter:brightness(1.04)}
+  .bigShare:active{transform:scale(.985)}
+  .bigShare svg{
+    width:48px;height:48px;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));
+  }
+  .visits{font-size:.9rem;color:#a8c9c2;margin:8px 0 2px}
+</style>
 </head>
 <body>
 
-<div id="mainPage">
-  <h2>تسبيح وذكر الله</h2>
-  <p>اضغط الدائرة للتسبيح 10 مرات، ثم شارك الأجر مع أصدقائك</p>
-  
+<!-- صفحة البداية -->
+<div id="start" class="wrap visible">
+  <h2>بسم الله الرحمن الرحيم</h2>
+  <p>﴿ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ﴾</p>
+  <button onclick="goApp()" class="circle">ابدأ التسبيح</button>
+</div>
+
+<!-- صفحة التسبيح -->
+<div id="app" class="wrap">
+  <div class="circle" onclick="doDhikr()">اضغط هنا</div>
   <div id="dhikrText"></div>
-  
-  <div id="circle" onclick="incrementCounter()">
-    <span id="countDisplay">0 / 10</span>
+  <div id="countDisplay"></div>
+</div>
+
+<!-- صفحة النهاية -->
+<div id="end" class="wrap">
+  <div class="only-card">
+    <h2>جزاك الله خيرًا</h2>
+    <div class="visits">زائروا الصفحة: <b id="visitors">—</b></div>
+    <button id="shareOnly" class="bigShare">
+      <svg viewBox="0 0 32 32">
+        <path fill="#E9FFF5" d="M16 3C9.37 3 4 8.37 4 15c0 2.11.53 4.11 1.46 5.86L4 29l8.33-1.3A12 12 0 0 0 28 15c0-6.63-5.37-12-12-12zm0 2c5.52 0 10 4.48 10 10a9.99 9.99 0 0 1-14.75 8.66l-.36-.2-4.52.7.9-4.41-.23-.39A9.97 9.97 0 0 1 6 15c0-5.52 4.48-10 10-10z"/>
+        <path fill="#E9FFF5" d="M21.88 18.63c-.2-.1-1.2-.59-1.39-.66-.19-.07-.33-.1-.46.1-.13.2-.53.66-.65.79-.12.13-.24.15-.44.05-.2-.1-.84-.31-1.6-.99a5.83 5.83 0 0 1-1.08-1.33c-.12-.2 0-.31.09-.41.09-.09.2-.24.3-.36.1-.12.13-.2.2-.33.07-.13.03-.25-.01-.35-.04-.1-.46-1.11-.64-1.52-.17-.41-.34-.35-.46-.36h-.39c-.13 0-.35.05-.53.25-.18.2-.7.69-.7 1.68 0 1 .72 1.97.82 2.11.1.13 1.42 2.17 3.45 3.05.48.21.85.33 1.14.43.48.15.91.13 1.25.08.38-.06 1.2-.49 1.37-.96.17-.47.17-.88.12-.96-.05-.08-.18-.13-.38-.23z"/>
+      </svg>
+      <div>شارك الأجر على واتساب</div>
+    </button>
   </div>
-  
-  <div id="clickCount">العداد: 0</div>
 </div>
 
-<div id="finalPage" style="display:none;">
-  <h2>بارك الله فيك 🌸</h2>
-  <p id="finalDhikr">سبحان الله والحمد لله ولا إله إلا الله والله أكبر</p>
-  <p id="visitorsCount">عدد الزوار: 0</p>
-  <button id="shareBtn" onclick="shareOnWhatsApp()">📤 شارك على الواتس</button>
-</div>
+<script>
+const SHARE_URL = "https://share.google/CxJR0KYYtNoNKd8Xs";
+let count = 10;
 
-<script src="script.js"></script>
+function goApp(){
+  document.getElementById('start').classList.remove('visible');
+  document.getElementById('start').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  updateCountDisplay();
+}
+
+function doDhikr(){
+  const textEl = document.getElementById('dhikrText');
+  textEl.textContent = "سبحان الله والحمد لله ولا إله إلا الله والله أكبر";
+  textEl.classList.add('show');
+  setTimeout(()=>textEl.classList.remove('show'),500);
+
+  count--;
+  updateCountDisplay();
+  if(count <= 0){ showEnd(); }
+}
+
+function updateCountDisplay(){
+  document.getElementById('countDisplay').textContent = "المتبقي: " + count;
+}
+
+async function showEnd(){
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('app').style.display='none';
+  document.getElementById('end').classList.add('visible');
+  // عداد الزوار
+  try{
+    const r = await fetch(`https://api.countapi.xyz/hit/tasbih/appvisits`);
+    const d = await r.json();
+    if(d.value) document.getElementById('visitors').textContent = d.value;
+  }catch(e){ document.getElementById('visitors').textContent = "—"; }
+}
+
+document.getElementById('shareOnly').addEventListener('click',()=>{
+  window.open("https://wa.me/?text=" + encodeURIComponent(SHARE_URL), "_blank");
+});
+</script>
+
 </body>
 </html>
