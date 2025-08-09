@@ -1,39 +1,34 @@
-let count = 0;
-const maxCount = 10;
+const SHARE_URL = "https://share.google/CxJR0KYYtNoNKd8Xs"; // رابطك النهائي
+const endWrap = document.getElementById('end');
+const visitorsEl = document.getElementById('visitors');
+const shareOnlyBtn = document.getElementById('shareOnly');
 
-function incrementCounter() {
-  if (count < maxCount) {
-    count++;
-    document.getElementById('countDisplay').textContent = `${count} / ${maxCount}`;
-    document.getElementById('clickCount').textContent = `العداد: ${count}`;
+async function showEnd(){
+  // أخفِ الصفحة الرئيسية
+  document.getElementById('app').style.display = 'none';
 
-    let dhikr = "سبحان الله والحمد لله ولا إله إلا الله والله أكبر";
-    let textElement = document.getElementById('dhikrText');
-    textElement.textContent = dhikr;
-    textElement.classList.add('show');
+  // أظهر صفحة النهاية بوضوح
+  endWrap.style.display = 'block';
+  endWrap.classList.add('visible');
 
-    if (count === maxCount) {
-      showFinalPage();
-    }
+  // عداد زوار ثابت + بديل محلي عند الفشل
+  const NS="tasbih-app", KEY="main-page-visitors";
+  try{
+    const r = await fetch(`https://api.countapi.xyz/hit/${NS}/${KEY}`, {cache:'no-store'});
+    const d = await r.json();
+    if(typeof d.value === 'number'){ visitorsEl.textContent = d.value.toLocaleString('ar-EG'); return; }
+    throw 0;
+  }catch(e){
+    try{
+      const k="local_visitors_once"; let v=+localStorage.getItem(k)||0;
+      if(!localStorage.getItem('visited_once_flag')){ v++; localStorage.setItem(k,v); localStorage.setItem('visited_once_flag','1'); }
+      visitorsEl.textContent = "≈ " + v.toLocaleString('ar-EG');
+    }catch{ visitorsEl.textContent = "—"; }
   }
 }
 
-function showFinalPage() {
-  document.getElementById('mainPage').style.display = "none";
-  document.getElementById('finalPage').style.display = "block";
-  updateVisitorCount();
+// مشاركة واتساب بالرابط فقط
+function shareWhatsApp(){
+  window.open("https://wa.me/?text=" + encodeURIComponent(SHARE_URL), "_blank", "noopener");
 }
-
-function shareOnWhatsApp() {
-  let text = "سبحان الله والحمد لله ولا إله إلا الله والله أكبر 🌸 شارك الأجر";
-  let url = window.location.href;
-  let whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`;
-  window.open(whatsappUrl, '_blank');
-}
-
-function updateVisitorCount() {
-  let count = localStorage.getItem('visitors') || 0;
-  count++;
-  localStorage.setItem('visitors', count);
-  document.getElementById('visitorsCount').textContent = `عدد الزوار: ${count}`;
-}
+shareOnlyBtn.addEventListener('click', shareWhatsApp);
